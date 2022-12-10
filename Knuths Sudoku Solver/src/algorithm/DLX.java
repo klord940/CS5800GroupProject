@@ -35,9 +35,10 @@ public class DLX {
 					ColumnNode col = columnNodes.get(j);
 					DancingNode newNode = new DancingNode(col);
 
-					if (prev == null)
+					if (prev == null) {
 						prev = newNode;
-
+					}
+					
 					col.top.linkDown(newNode);
 					prev = prev.linkRight(newNode);
 					col.size++;
@@ -87,12 +88,19 @@ public class DLX {
 	}
 	
 	private ColumnNode selectColumnNodeHeuristic() {
-		// TODO Auto-generated method stub
-		return null;
+		int min = Integer.MAX_VALUE;
+		ColumnNode ret = null;
+		for(ColumnNode c = (ColumnNode) header.right; c != header; c = (ColumnNode) c.right) {
+			if(c.size < min) {
+				min = c.size;
+				ret = c;
+			}
+		}
+		return ret;
 	}
 
 	public void solve() {
-		// TODO
+		process(0);
 	}
 	
 	

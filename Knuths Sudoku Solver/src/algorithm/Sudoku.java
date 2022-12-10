@@ -6,28 +6,36 @@ import java.util.List;
 public class Sudoku {
 
 	// Grid size
-		private static final int SIZE = 9;
+	private static final int SIZE = 9;
+	
 	// Box size
-		private static final int BOX_SIZE = 3;
-		private static final int EMPTY_CELL = 0;
+	private static final int BOX_SIZE = 3;
+	private static final int EMPTY_CELL = 0;
+	
 	// 4 constraints : cell, line, column, boxes
-		private static final int CONSTRAINTS = 4;
+	private static final int CONSTRAINTS = 4;
+	
 	// Values for each cells
-		private static final int MIN_VALUE = 1;
-		private static final int MAX_VALUE = SIZE;
+	private static final int MIN_VALUE = 1;
+	private static final int MAX_VALUE = SIZE;
+	
 	// Starting index for cover matrix
-		private static final int COVER_START_INDEX = 1;
+	private static final int COVER_START_INDEX = 1;
 
-		private int[][] grid;
-		private int[][] gridSolved;
+	// Grids for initial and solved
+	private int[][] grid;
+	private int[][] gridSolved;
 
+	
 	public Sudoku(int[][] grid) {
 		this.grid = new int[SIZE][SIZE];
 
-	    for (int i = 0; i < SIZE; i++)
-	    	for (int j = 0; j < SIZE; j++)
+	    for (int i = 0; i < SIZE; i++) {
+	    	for (int j = 0; j < SIZE; j++) {
 	    		this.grid[i][j] = grid[i][j];
-	  	}
+	    	}	    		
+	    }	    	
+	}
 
 	// Index in the cover matrix
 	private int indexInCoverMatrix(int row, int column, int num) {
@@ -171,5 +179,9 @@ public class Sudoku {
 		}
 		  
 		return result;
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 }
