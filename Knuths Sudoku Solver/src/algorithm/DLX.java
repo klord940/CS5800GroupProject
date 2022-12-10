@@ -100,8 +100,22 @@ public class DLX {
 	}
 
 	public void solve() {
+		answer = new LinkedList<DancingNode>();
 		process(0);
 	}
 	
-	
+	private void printBoard(){ // diagnostics to have a look at the board state
+        System.out.println("Board Config: ");
+        for(ColumnNode tmp = (ColumnNode) header.right; tmp != header; tmp = (ColumnNode) tmp.right){
+
+            for(DancingNode d = tmp.bottom; d != tmp; d = d.bottom){
+                String ret = "";
+                ret += d.column.name + " --> ";
+                for(DancingNode i = d.right; i != d; i = i.right){
+                    ret += i.column.name + " --> ";
+                }
+                System.out.println(ret);
+            }
+        }
+    }
 }
