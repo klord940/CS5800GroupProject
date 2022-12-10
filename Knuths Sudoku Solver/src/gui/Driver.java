@@ -1,3 +1,4 @@
+package gui;
 /**
  * Driver which creates an instance of the Soduku Game controller.
  * 

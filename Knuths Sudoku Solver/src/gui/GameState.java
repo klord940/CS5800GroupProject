@@ -1,3 +1,4 @@
+package gui;
 /**
  * GameState Enum, set to either TITLESCREEN, GAMESCREEN, COMPLETESCREEN.
  * 
