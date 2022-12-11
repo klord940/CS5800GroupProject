@@ -1,8 +1,5 @@
 package gui;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import algorithm.Sudoku;
 
 /**
@@ -10,7 +7,7 @@ import algorithm.Sudoku;
  * 
  * @author Robert Wilson
  * Created: 19 NOV 2022
- * Class: CS5800 
+ * Class: CS 5800 
  */
 public class Model {
 	
@@ -73,6 +70,8 @@ public class Model {
 	 * @return true if the given puzzle is valid	 
 	 */
 	public boolean isValidPuzzle() {
+		// test input for int[][] matrix vs. Integer[][] matrix
+		/*
 		int [][] inputGrid = {
 				{1, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -84,11 +83,13 @@ public class Model {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0}				
 		};
+		*/
 		
+		// Count instances of non null values
 		int count = 0;
 		for(Integer[] i : board) {
 			for(Integer j : i) {
-				if(j.intValue() != 0) {
+				if(j != null) {
 					count++;
 				}
 			}
@@ -100,7 +101,7 @@ public class Model {
 		}
 		
 		// If there is greater than 16 filled spots there is an unique solution for it
-		Sudoku s = new Sudoku(inputGrid);
+		Sudoku s = new Sudoku(board);
 		this.validPuzzle = s.solve();
 		return validPuzzle;
 	}

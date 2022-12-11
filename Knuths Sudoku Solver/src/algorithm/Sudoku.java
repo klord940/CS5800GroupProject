@@ -4,10 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
+ * Main class for setting up the exact cover problem with the constraints for Sudoku.  
+ * This class will call the Dancing Links algorithm X runner, DLX.java.
  * 
  * @author Robert Wilson
- *
+ * Created: 09 DEC S2022
+ * Class: CS 5800
  */
 public class Sudoku {
 
@@ -32,7 +34,12 @@ public class Sudoku {
 	private int[][] grid;
 	private int[][] gridSolved;
 
-	
+	/**
+	 * Constructor for sudoku class with int[][] input.  Fills out the grid matrix 
+	 * from the input grid.
+	 * 
+	 * @param grid input board from source with type int.
+	 */
 	public Sudoku(int[][] grid) {
 		this.grid = new int[SIZE][SIZE];
 
@@ -43,6 +50,12 @@ public class Sudoku {
 	    }	    	
 	}
 
+	/**
+	 * Constructor for Sudoku class with Integer[][] input.  Fills out the grid matrix
+	 * from the input grid.
+	 * 
+	 * @param board input board from source with type Integer.
+	 */
 	public Sudoku(Integer[][] board) {
 		this.grid = new int[SIZE][SIZE];
 
@@ -58,12 +71,23 @@ public class Sudoku {
 	    }
 	}
 
-	// Index in the cover matrix
+	/**
+	 * Index in the cover matrix
+	 * 
+	 * @param row (int) the row in the cover matrix.
+	 * @param column (int) the column in the cover matrix
+	 * @param num (int) 
+	 * @return
+	 */
 	private int indexInCoverMatrix(int row, int column, int num) {
 		return (row - 1) * SIZE * SIZE + (column - 1) * SIZE + (num - 1);
   	}
 
-	// Building of an empty cover matrix
+	/**
+	 * Building of an empty cover matrix, using the constraints outlined below for Sudoku.
+	 * 
+	 * @return coverMatrix (int[][]) the empty Cover Matrix with the constraints applied.
+	 */
 	private int[][] createCoverMatrix() {
 		int[][] coverMatrix = new int[SIZE * SIZE * MAX_VALUE][SIZE * SIZE * CONSTRAINTS];
 
@@ -76,6 +100,14 @@ public class Sudoku {
 	    return coverMatrix;
   	}
 
+	/**
+	 * Creates the Box constraints which are BOXSIZE x BOXSIZE. 
+	 * Only values from MIN_VALUE through MAX_VALUE in the BOX_SIZE once.
+	 * 
+	 * @param matrix (int[][]) The cover matrix so far.
+	 * @param header (int) the head of the matrix so far
+	 * @return header (int) the head after running through the constraints
+	 */
 	private int createBoxConstraints(int[][] matrix, int header) {
 		for (int row = COVER_START_INDEX; row <= SIZE; row += BOX_SIZE) {
 			for (int column = COVER_START_INDEX; column <= SIZE; column += BOX_SIZE) {
@@ -89,10 +121,17 @@ public class Sudoku {
 				}
 			}
 		}
-		
 		return header;
 	}
 
+	/**
+	 * Creates the Column constraints in which only one instance of MIN_VALUE 
+	 * through SIZE can be in each column. 
+	 * 
+	 * @param matrix (int[][]) The cover matrix so far.
+	 * @param header (int) The header of the matrix so far.
+	 * @return header (int)  The header after running through the constraints
+	 */
 	private int createColumnConstraints(int[][] matrix, int header) {
 		for (int column = COVER_START_INDEX; column <= SIZE; column++) {
 			for (int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
@@ -102,10 +141,17 @@ public class Sudoku {
 				}
 			}
     	}
-		
 	    return header;
 	}
 
+	/**
+	 * Creates the row constraints in which only one instance of MIN_VALUE
+	 * through SIZE can be in each row. 
+	 * 
+	 * @param matrix (int[][]) The cover matrix so far.
+	 * @param header (int)  The header of the matrix so far.
+	 * @return header (int)  The header after running through the constraints.
+	 */
 	private int createRowConstraints(int[][] matrix, int header) {
 		for (int row = COVER_START_INDEX; row <= SIZE; row++) {
 			for (int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
@@ -115,10 +161,17 @@ public class Sudoku {
 				}
 			}
 		}
-		
 	    return header;
 	}
 
+	/**
+	 * Creates the cell constraints in which only one instance of MIN_VALUE
+	 * through SIZE can be in each cell.
+	 * 
+	 * @param matrix (int[][])  The cover matrix so far.
+	 * @param header (int)  The header of the matrix so far.
+	 * @return header (int)  The header after running through the constraints.
+	 */
 	private int createCellConstraints(int[][] matrix, int header) {
 		for (int row = COVER_START_INDEX; row <= SIZE; row++) {
 			for (int column = COVER_START_INDEX; column <= SIZE; column++, header++) {
@@ -128,11 +181,16 @@ public class Sudoku {
 				}
 			}
 		}
-
 	    return header;
 	}
 
-	// Converting Sudoku grid as a cover matrix
+	/**
+	 * Converting Sudoku grid as a cover matrix, given an input matrix.
+	 * 
+	 * @param grid (int[][])  Input grid of the original Soduku problem.
+	 * @return coverMatrix (int[][])  The cover matrix with the Sudoku
+	 * 			 constraints added as well as the inputs from the given problem.
+	 */
 	private int[][] convertInCoverMatrix(int[][] grid) {
 		int[][] coverMatrix = createCoverMatrix();
 
@@ -150,24 +208,51 @@ public class Sudoku {
 				}
 			}
 		}
-
 	    return coverMatrix;
 	}
-	  
+
+	/**
+	 * Converts the Sudoku problem into an Exact cover problem with the proper constraints.
+	 * Then it creates a quadruple chained list and calls the DLX solve method, Algorithm X.
+	 * Lastly it converts the solution back to a human readable sudoku solution.  If there is 
+	 * a solution it returns true and if not then it returns false.  
+	 * 
+	 * @return solved (boolean)  true if it has a solution and false otherwise.
+	 */
 	public boolean solve() {
+		// Boolean for whether there is a solution or not
 		boolean solved = false;
+		
+		// convert the input grid into a cover matrix
 		int[][] cover = convertInCoverMatrix(grid);
 		//printCoverMatrix(cover);
+		
+		// create a quadruple chained double linked list
 		DLX dlx = new DLX(cover);
+		
+		// Use Algorithm X and Dancing Links to solve the problem
 		dlx.solve();
+		
+		// Convert the cover solution back to a Sudoku style grid
 		gridSolved = convertDLXListToGrid(dlx.result);
+		
+		// validate whether a solution has been found and print to console
 		solved = validateBoard();
 		System.out.println(solved);
+		
+		// Display both grids, before and after algorithm to the console
 		displaySolution();
+		
+		// Return boolean of whether the problem has been solved
 		return solved;
 	}
-	  
+
+	/**
+	 * Displays the original grid and the solution grid to the console terminal.
+	 * 
+	 */
 	private void displaySolution() {
+		// Solved grid for display
 		for(int[] i : gridSolved) {
 			for(int j : i) {
 				System.out.print(j);
@@ -177,6 +262,7 @@ public class Sudoku {
 		
 		System.out.println("\n");
 		
+		// Original problem for display
 		for(int[] i : grid) {
 			for(int j : i) {
 				System.out.print(j);
@@ -185,11 +271,22 @@ public class Sudoku {
 		}
 	}
 
+	/**
+	 * Returns the answer grid after the algorithm has been run.  If the 
+	 * algorithm does not come up with a solution then return the original grid 
+	 * (answer will be null in this case).  
+	 * 
+	 * @param answer (List<DancingNode>) the answer list from the algorithm
+	 * @return result/grid (int[][]) The answer as a 2d grid or the original 
+	 * 			grid if answer is null.
+	 */
 	private int[][] convertDLXListToGrid(List<DancingNode> answer) {
+		// If there is no solution then return original grid
 		if(answer == null) {
 			return this.grid;
 		}
 		
+		// initialize answer grid
 		int[][] result = new int[SIZE][SIZE];
 
 		for (DancingNode n : answer) {
@@ -205,20 +302,27 @@ public class Sudoku {
 			  	}
 	  		}
 
-			// we get line and column
+			// we get row and column
 			int ans1 = Integer.parseInt(rcNode.column.name);
 			int ans2 = Integer.parseInt(rcNode.right.column.name);
 			int r = ans1 / SIZE;
 			int c = ans1 % SIZE;
+			
 			// and the affected value
 			int num = (ans2 % SIZE) + 1;
+			
 			// we affect that on the result grid
 			result[r][c] = num;
 		}
-		  
 		return result;
 	}
-	
+
+	/**
+	 * Validates whether the solution is the same as the input grid
+	 * and returns true if it is not, false otherwise. 
+	 * 
+	 * @return (bool) true if not the same as the input, false if it is.
+	 */
 	private boolean validateBoard() {
 		for(int i = 0; i < SIZE; i++) {
 			for(int j = 0; j < SIZE; j++) {
@@ -230,22 +334,43 @@ public class Sudoku {
 		return false;
 	}
 	
+	/**
+	 * If this is run as a stand alone then use the trail grid provided.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		int [][] inputGrid = {
-				{1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 3, 6, 1, 0, 0, 0, 0},
-				{0, 7, 0, 0, 9, 0, 1, 0, 0},
-				{0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 4, 5, 0, 0, 1},
-				{0, 0, 0, 1, 0, 0, 0, 3, 0},
-				{0, 0, 1, 0, 0, 0, 0, 6, 8},
-				{0, 0, 8, 5, 0, 0, 0, 1, 0},
-				{0, 0, 0, 0, 0, 1, 0, 0, 0}				
+		// Trial input grids
+		/*
+		int [][] inputGrid1 = {
+				{0, 0, 3, 0, 1, 0, 0, 0, 0},
+				{4, 1, 5, 0, 0, 0, 0, 9, 0},
+				{2, 0, 6, 5, 0, 0, 3, 0, 0},
+				{5, 0, 0, 0, 8, 0, 0, 0, 9},
+				{0, 7, 0, 9, 0, 0, 0, 3, 2},
+				{0, 3, 8, 0, 0, 4, 0, 6, 0},
+				{0, 0, 0, 2, 6, 0, 4, 0, 3},
+				{0, 0, 0, 3, 0, 0, 0, 0, 8},
+				{3, 2, 0, 0, 0, 7, 9, 5, 0}				
+		};
+		*/
+		
+		int [][] inputGrid2 = {
+				{0, 0, 0, 0, 0, 0, 3, 0, 0},
+				{1, 0, 0, 4, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 0, 5},
+				{9, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 2, 6, 0, 0},
+				{0, 0, 0, 0, 5, 3, 0, 0, 0},
+				{0, 5, 0, 8, 0, 0, 0, 0, 0},
+				{0, 0, 0, 9, 0, 0, 0, 7, 0},
+				{0, 8, 3, 0, 0, 0, 0, 4, 0}				
 		};
 		
-		Sudoku s = new Sudoku(inputGrid);
+		// create an instance of itself to solve
+		Sudoku s = new Sudoku(inputGrid2);
 		
+		// Solve said instance
 		s.solve();
-		
 	}
 }

@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
  * 
  * @author Robert Wilson
  * Created: 19 NOV 2022
- * Class: cs5800
+ * Class: CS 5800
  *
  */
 public class Listener implements ActionListener {

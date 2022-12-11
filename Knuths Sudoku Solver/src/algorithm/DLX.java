@@ -4,16 +4,41 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * The Dancing Links quadruple linked list and Algorithm X.  
+ * Process method runs algorithm X. CreateDLXList creates the 
+ * linked list.
+ * 
+ * @author Robert Wilson
+ * Created: 09 DECS 2022
+ * Class: CS 5800
+ */
 public class DLX {
 
+	// header for each columnNode
 	private ColumnNode header;
+	
+	// The answer List is used to create the cover for each iteration
 	private List<DancingNode> answer;
+	
+	// The result list is only built if the solution is found
 	public List<DancingNode> result;
 
+	/**
+	 * Constructor for a given cover matrix.
+	 * 
+	 * @param cover (int[][]) The cover matrix to input into the DLX
+	 */
 	public DLX(int[][] cover) {
 		header = createDLXList(cover);
 	}
 
+	/**
+	 * Creates a Dancing Links quad links List.
+	 * 
+	 * @param grid (int[][]) cover grid to be turned into list
+	 * @return headerNode (ColumnNode)
+	 */
 	private ColumnNode createDLXList(int[][] grid) {
 		final int nbColumns = grid[0].length;
 		ColumnNode headerNode = new ColumnNode("header");
@@ -50,9 +75,13 @@ public class DLX {
 
 		return headerNode;
 	}
-	
+
+	/**
+	 * Algorithm X run through. 
+	 * 
+	 * @param k (int) the iteration we are on. Starts at zero 
+	 */
 	private void process(int k) {
-		printBoard();
 		if (header.right == header) {
 			// End of Algorithm X
 			// Result is copied in a result list
@@ -71,7 +100,7 @@ public class DLX {
 		    		j.column.cover();
 		    	}
 
-		    	// recursive call to leverl k + 1
+		    	// recursive call to level k + 1
 		    	process(k + 1);
 
 		    	// We go back
@@ -87,7 +116,13 @@ public class DLX {
 		    c.uncover();
 		}
 	}
-	
+
+	/**
+	 * The selection method for columns inside algorithm X.  
+	 * Selecting the minimum size column first.
+	 * 
+	 * @return (ColumnNode) The column node selected from the method.
+	 */
 	private ColumnNode selectColumnNodeHeuristic() {
 		int min = Integer.MAX_VALUE;
 		ColumnNode ret = null;
@@ -100,12 +135,19 @@ public class DLX {
 		return ret;
 	}
 
+	/**
+	 * Creates the empty answer list, then calls Algorithm X with int 0.
+	 * 
+	 */
 	public void solve() {
 		answer = new LinkedList<DancingNode>();
 		process(0);
 	}
-	
-	private void printBoard(){ // diagnostics to have a look at the board state
+
+	/**
+	 * Diagnostics to have a look at the board state
+	 */
+	private void printBoard() {
         System.out.println("Board Config: ");
         for(ColumnNode tmp = (ColumnNode) header.right; tmp != header; tmp = (ColumnNode) tmp.right){
 
