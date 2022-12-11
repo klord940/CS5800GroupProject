@@ -58,7 +58,7 @@ public class Controller {
 		case GAMESCREEN:
 			if(!model.gameOver) {
 				model.isGameOver();
-				if(model.isGameOver()) {
+				if(model.gameOver) {
 					setGameState(GameState.COMPLETESCREEN);
 				}
 			}

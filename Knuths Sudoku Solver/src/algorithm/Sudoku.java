@@ -3,6 +3,12 @@ package algorithm;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 
+ * 
+ * @author Robert Wilson
+ *
+ */
 public class Sudoku {
 
 	// Grid size
@@ -35,6 +41,21 @@ public class Sudoku {
 	    		this.grid[i][j] = grid[i][j];
 	    	}	    		
 	    }	    	
+	}
+
+	public Sudoku(Integer[][] board) {
+		this.grid = new int[SIZE][SIZE];
+
+	    for (int i = 0; i < SIZE; i++) {
+	    	for (int j = 0; j < SIZE; j++) {
+	    		if(board[i][j]  == null) {
+	    			this.grid[i][j] = 0;
+	    		} else {
+	    			this.grid[i][j] = board[i][j];
+	    		}
+	    		
+	    	}	    		
+	    }
 	}
 
 	// Index in the cover matrix
@@ -133,18 +154,30 @@ public class Sudoku {
 	    return coverMatrix;
 	}
 	  
-	public void solve() {
+	public boolean solve() {
+		boolean solved = false;
 		int[][] cover = convertInCoverMatrix(grid);
 		//printCoverMatrix(cover);
 		DLX dlx = new DLX(cover);
 		dlx.solve();
 		gridSolved = convertDLXListToGrid(dlx.result);
+		solved = validateBoard();
+		System.out.println(solved);
 		displaySolution();
+		return solved;
 	}
 	  
 	private void displaySolution() {
-		// TODO Auto-generated method stub
 		for(int[] i : gridSolved) {
+			for(int j : i) {
+				System.out.print(j);
+			}
+			System.out.println();
+		}
+		
+		System.out.println("\n");
+		
+		for(int[] i : grid) {
 			for(int j : i) {
 				System.out.print(j);
 			}
@@ -153,6 +186,10 @@ public class Sudoku {
 	}
 
 	private int[][] convertDLXListToGrid(List<DancingNode> answer) {
+		if(answer == null) {
+			return this.grid;
+		}
+		
 		int[][] result = new int[SIZE][SIZE];
 
 		for (DancingNode n : answer) {
@@ -182,17 +219,28 @@ public class Sudoku {
 		return result;
 	}
 	
+	private boolean validateBoard() {
+		for(int i = 0; i < SIZE; i++) {
+			for(int j = 0; j < SIZE; j++) {
+				if(grid[i][j] != gridSolved[i][j] ) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public static void main(String[] args) {
 		int [][] inputGrid = {
-				{8, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 3, 6, 0, 0, 0, 0, 0},
-				{0, 7, 0, 0, 9, 0, 2, 0, 0},
-				{0, 5, 0, 0, 0, 7, 0, 0, 0},
-				{0, 0, 0, 0, 4, 5, 7, 0, 0},
+				{1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 3, 6, 1, 0, 0, 0, 0},
+				{0, 7, 0, 0, 9, 0, 1, 0, 0},
+				{0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 4, 5, 0, 0, 1},
 				{0, 0, 0, 1, 0, 0, 0, 3, 0},
 				{0, 0, 1, 0, 0, 0, 0, 6, 8},
 				{0, 0, 8, 5, 0, 0, 0, 1, 0},
-				{0, 9, 0, 0, 0, 0, 4, 0, 0}				
+				{0, 0, 0, 0, 0, 1, 0, 0, 0}				
 		};
 		
 		Sudoku s = new Sudoku(inputGrid);

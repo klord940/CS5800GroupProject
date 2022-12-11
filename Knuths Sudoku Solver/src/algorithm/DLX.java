@@ -52,6 +52,7 @@ public class DLX {
 	}
 	
 	private void process(int k) {
+		printBoard();
 		if (header.right == header) {
 			// End of Algorithm X
 			// Result is copied in a result list

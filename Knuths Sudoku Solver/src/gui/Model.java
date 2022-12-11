@@ -3,6 +3,8 @@ package gui;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import algorithm.Sudoku;
+
 /**
  * Sudoku model contains all functionality of the game.
  * 
@@ -71,6 +73,35 @@ public class Model {
 	 * @return true if the given puzzle is valid	 
 	 */
 	public boolean isValidPuzzle() {
+		int [][] inputGrid = {
+				{1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0}				
+		};
+		
+		int count = 0;
+		for(Integer[] i : board) {
+			for(Integer j : i) {
+				if(j.intValue() != 0) {
+					count++;
+				}
+			}
+		}
+		
+		// If there is less than 17 filled spots the solver will take too long
+		if(count <= 16) {
+			return validPuzzle = false;
+		}
+		
+		// If there is greater than 16 filled spots there is an unique solution for it
+		Sudoku s = new Sudoku(inputGrid);
+		this.validPuzzle = s.solve();
 		return validPuzzle;
 	}
 	
