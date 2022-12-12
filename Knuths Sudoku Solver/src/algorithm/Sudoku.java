@@ -21,7 +21,7 @@ public class Sudoku {
 	private static final int EMPTY_CELL = 0;
 	
 	// 4 constraints : cell, line, column, boxes
-	private static final int CONSTRAINTS = 4;
+	private static final int CONSTRAINTS = 5;
 	
 	// Values for each cells
 	private static final int MIN_VALUE = 1;
@@ -95,11 +95,32 @@ public class Sudoku {
 	    header = createCellConstraints(coverMatrix, header);
 	    header = createRowConstraints(coverMatrix, header);
 	    header = createColumnConstraints(coverMatrix, header);
-	    createBoxConstraints(coverMatrix, header);
+	    header = createBoxConstraints(coverMatrix, header);
+	    createHyperBoxConstraints(coverMatrix, header);
 
 	    return coverMatrix;
   	}
 
+	private int createHyperBoxConstraints(int[][] matrix, int header) {
+		for(int row = (COVER_START_INDEX ); row <= SIZE; row += (BOX_SIZE + 1)) {
+			for(int column = (COVER_START_INDEX ); column <= SIZE; column += (BOX_SIZE + 1)) {
+				for(int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
+					for(int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
+						for(int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
+							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
+							try {
+								matrix[index][header] = 1;
+							} catch(Exception e) {
+								System.out.println(e);
+							}
+						}
+					}
+				}
+			}
+		}
+		return header;
+	}
+	
 	/**
 	 * Creates the Box constraints which are BOXSIZE x BOXSIZE. 
 	 * Only values from MIN_VALUE through MAX_VALUE in the BOX_SIZE once.
@@ -226,7 +247,7 @@ public class Sudoku {
 		// convert the input grid into a cover matrix
 		int[][] cover = convertInCoverMatrix(grid);
 		//printCoverMatrix(cover);
-		
+		printMatrix(cover);
 		// create a quadruple chained double linked list
 		DLX dlx = new DLX(cover);
 		
@@ -271,6 +292,15 @@ public class Sudoku {
 		}
 	}
 
+	private void printMatrix(int[][] matrix) {
+		for(int[] i : matrix) {
+			for(int j : i) {
+				System.out.print(j);
+			}
+			System.out.println();
+		}
+	}
+	
 	/**
 	 * Returns the answer grid after the algorithm has been run.  If the 
 	 * algorithm does not come up with a solution then return the original grid 
@@ -341,7 +371,7 @@ public class Sudoku {
 	 */
 	public static void main(String[] args) {
 		// Trial input grids
-		/*
+		
 		int [][] inputGrid1 = {
 				{0, 0, 3, 0, 1, 0, 0, 0, 0},
 				{4, 1, 5, 0, 0, 0, 0, 9, 0},
@@ -353,7 +383,7 @@ public class Sudoku {
 				{0, 0, 0, 3, 0, 0, 0, 0, 8},
 				{3, 2, 0, 0, 0, 7, 9, 5, 0}				
 		};
-		*/
+		
 		
 		int [][] inputGrid2 = {
 				{0, 0, 0, 0, 0, 0, 3, 0, 0},
@@ -367,8 +397,28 @@ public class Sudoku {
 				{0, 8, 3, 0, 0, 0, 0, 4, 0}				
 		};
 		
+		
+		int[][] HyperInput = {
+				{1, 5, 6, 2, 4, 3, 7, 8, 9},
+				{2, 3, 4, 7, 8, 9, 1, 5, 6},
+				{7, 8, 9, 5, 1, 6, 2, 4, 3},
+				{9, 6, 2, 1, 5, 7, 8, 3, 4},
+				{5, 4, 3, 8, 6, 2, 9, 1, 7},
+				{8, 7, 1, 3, 9, 4, 6, 2, 5},
+				{4, 2, 5, 6, 7, 8, 3, 9, 1},
+				{6, 9, 8, 4, 3, 1, 5, 7, 2},
+				{3, 1, 7, 9, 2, 5, 4, 6, 0}
+		};
+		
+		int[][] input_4 = {
+				{0, 1, 0, 0},
+				{0, 2, 3, 0},
+				{1, 0, 0, 0},
+				{0, 0, 2, 0}
+		};
+		
 		// create an instance of itself to solve
-		Sudoku s = new Sudoku(inputGrid2);
+		Sudoku s = new Sudoku(HyperInput);
 		
 		// Solve said instance
 		s.solve();
