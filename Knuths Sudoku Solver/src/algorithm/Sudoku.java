@@ -66,7 +66,6 @@ public class Sudoku {
 	    		} else {
 	    			this.grid[i][j] = board[i][j];
 	    		}
-	    		
 	    	}	    		
 	    }
 	}
@@ -92,27 +91,33 @@ public class Sudoku {
 		int[][] coverMatrix = new int[SIZE * SIZE * MAX_VALUE][SIZE * SIZE * CONSTRAINTS];
 
 	    int header = 0;
-	    header = createCellConstraints(coverMatrix, header);
-	    header = createRowConstraints(coverMatrix, header);
-	    header = createColumnConstraints(coverMatrix, header);
-	    header = createBoxConstraints(coverMatrix, header);
-	    createHyperBoxConstraints(coverMatrix, header);
-
+	    header = createCellConstraints(coverMatrix, header);// System.out.println("Header: " + header);
+	    header = createRowConstraints(coverMatrix, header); //System.out.println("Header: " + header);
+	    header = createColumnConstraints(coverMatrix, header);// System.out.println("Header: " + header);
+		//System.out.println("Box: ");
+	    header = createBoxConstraints(coverMatrix, header); //System.out.println("Header: " + header);
+	    //System.out.println(countMatrix(coverMatrix) + " Header: " + header);
+	    //createCellConstraints(coverMatrix, header);
+	    System.out.println("HyperBox2");
+	    createHyperBoxConstraints2(coverMatrix, header); 
+	    System.out.println("HyperBox");
+	    header = createHyperBoxConstraints(coverMatrix, header);
+	    //System.out.println(countMatrix(coverMatrix) + " Header: " + header);
+	    
 	    return coverMatrix;
   	}
 
 	private int createHyperBoxConstraints(int[][] matrix, int header) {
-		for(int row = (COVER_START_INDEX ); row <= SIZE; row += (BOX_SIZE + 1)) {
-			for(int column = (COVER_START_INDEX ); column <= SIZE; column += (BOX_SIZE + 1)) {
+		header += 10;
+		for(int row = (COVER_START_INDEX + 1); row <= SIZE; row += (BOX_SIZE + 1)) {
+			for(int column = (COVER_START_INDEX + 1); column <= SIZE; column += (BOX_SIZE + 1)) {
 				for(int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
 					for(int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
 						for(int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
+							System.out.println("Hyper Header: " + header);
+							System.out.println("Row: " + (row + rowDelta) + "\tColumn: " + (column + columnDelta) + "\tNumber: " + n);
 							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
-							try {
-								matrix[index][header] = 1;
-							} catch(Exception e) {
-								System.out.println(e);
-							}
+							matrix[index][header] = 1;
 						}
 					}
 				}
@@ -121,6 +126,24 @@ public class Sudoku {
 		return header;
 	}
 	
+	private int createHyperBoxConstraints2(int[][] matrix, int header) {		
+		for (int row = COVER_START_INDEX; row <= SIZE; row++) {
+			for (int column = COVER_START_INDEX; column <= SIZE; column++, header++) {
+				for (int n = COVER_START_INDEX; n <= SIZE; n++) {
+					if(((row >= 2 && row <= 4) && (column >= 2 && column <= 4)) || ((row >= 2 && row <= 4) && (column >= 6 && column <= 8)) || ((row >= 6 && row <= 8) && (column >= 2 && column <= 4)) || ((row >= 6 && row <= 8) && (column >= 6 && column <= 8))) {
+						System.out.println("Header: " + header);
+						continue;
+					} else {
+						System.out.println("row: " + row + "\tColumn: " + column + "\tNumber: " + n);
+						int index = indexInCoverMatrix(row, column, n);
+						matrix[index][header] = 1;
+					}
+				}
+			}
+		}
+	    return header;
+	}
+
 	/**
 	 * Creates the Box constraints which are BOXSIZE x BOXSIZE. 
 	 * Only values from MIN_VALUE through MAX_VALUE in the BOX_SIZE once.
@@ -135,6 +158,7 @@ public class Sudoku {
 				for (int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
 					for (int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
 						for (int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
+							//System.out.println("Row: " + (row + rowDelta) + "\tColumn: " + (column + columnDelta) + "\tNumber: " + n);
 							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
 							matrix[index][header] = 1;
 						}
@@ -229,6 +253,7 @@ public class Sudoku {
 				}
 			}
 		}
+		System.out.println(countMatrix(coverMatrix));
 	    return coverMatrix;
 	}
 
@@ -247,7 +272,7 @@ public class Sudoku {
 		// convert the input grid into a cover matrix
 		int[][] cover = convertInCoverMatrix(grid);
 		//printCoverMatrix(cover);
-		printMatrix(cover);
+		//printMatrix(cover);
 		// create a quadruple chained double linked list
 		DLX dlx = new DLX(cover);
 		
@@ -292,6 +317,16 @@ public class Sudoku {
 		}
 	}
 
+	private int countMatrix(int[][] matrix) {
+		int count = 0;
+		for(int[] i : matrix) {
+			for(int j : i) {
+				if(j == 1) count++;
+			}
+		}
+		return count;
+	}
+	
 	private void printMatrix(int[][] matrix) {
 		for(int[] i : matrix) {
 			for(int j : i) {
@@ -407,7 +442,19 @@ public class Sudoku {
 				{8, 7, 1, 3, 9, 4, 6, 2, 5},
 				{4, 2, 5, 6, 7, 8, 3, 9, 1},
 				{6, 9, 8, 4, 3, 1, 5, 7, 2},
-				{3, 1, 7, 9, 2, 5, 4, 6, 0}
+				{3, 1, 7, 9, 2, 5, 4, 6, 8}
+		};
+		
+		int[][] HyperInput2 = {
+				{0, 0, 0, 0, 0, 6, 0, 0, 0},
+				{4, 6, 0, 0, 0, 0, 0, 8, 9},
+				{0, 0, 5, 0, 1, 0, 6, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 9, 0},
+				{1, 0, 0, 0, 3, 0, 8, 0, 0},
+				{0, 5, 0, 0, 0, 0, 4, 0, 0},
+				{0, 8, 1, 0, 0, 2, 0, 0, 6},
+				{0, 0, 0, 0, 9, 1, 0, 7, 0},
+				{6, 0, 0, 5, 8, 0, 2, 1, 0}
 		};
 		
 		int[][] input_4 = {
@@ -418,7 +465,7 @@ public class Sudoku {
 		};
 		
 		// create an instance of itself to solve
-		Sudoku s = new Sudoku(HyperInput);
+		Sudoku s = new Sudoku(HyperInput2);
 		
 		// Solve said instance
 		s.solve();

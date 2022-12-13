@@ -34,7 +34,8 @@ public class DLX {
 	}
 
 	/**
-	 * Creates a Dancing Links quad links List.
+	 * Creates a Dancing Links quad links List.  If there is a one at a spot 
+	 * in the cover matrix then a node will be created.
 	 * 
 	 * @param grid (int[][]) cover grid to be turned into list
 	 * @return headerNode (ColumnNode)
@@ -90,7 +91,7 @@ public class DLX {
 			// we choose column c
 		    ColumnNode c = selectColumnNodeHeuristic();
 		    c.cover();
-
+		    System.out.println("Column size: " + c.size);
 		    for (DancingNode r = c.bottom; r != c; r = r.bottom) {
 		    	// We add r line to partial solution
 		    	answer.add(r);
@@ -141,6 +142,7 @@ public class DLX {
 	 */
 	public void solve() {
 		answer = new LinkedList<DancingNode>();
+		//printBoard();
 		process(0);
 	}
 
