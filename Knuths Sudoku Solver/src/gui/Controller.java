@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * and the ActionEvent Listener.
  * 
  * @author Robert Wilson
+ * @author Kristina Lord
  * Created: 19 NOV 2022
  * Class: CS5800 
  * 
