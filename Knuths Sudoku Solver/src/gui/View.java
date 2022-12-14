@@ -93,6 +93,7 @@ public class View extends JPanel{
 		
 		// Call setup methods
 		setActionListener(controller);
+		checkSolution.addActionListener(listener);
 		titleScreen();
 	}
 	
@@ -113,7 +114,7 @@ public class View extends JPanel{
 		        		board[row][col].addActionListener(listener);
 		        }
 			}
-			checkSolution.addActionListener(listener);
+//			checkSolution.addActionListener(listener);
 			back.addActionListener(listener);
 			break;
 //		case TEXTINPUTSCREEN: 
@@ -279,9 +280,8 @@ public class View extends JPanel{
 	void completedScreen() {
 		// Displays end text
 		importText.setText("Solved");
+		options.remove(checkSolution);
 		
-		// Disable button
-		checkSolution.setEnabled(false);
 	}
 	
 	/**
@@ -305,7 +305,6 @@ public class View extends JPanel{
 	 * then perform same action as play screen.  
 	 */
 	void resetButton(Controller controller) {
-		checkSolution.setEnabled(true);
 		switch(controller.gameState) {
 		case TITLESCREEN: 
 			setup(controller);
@@ -318,7 +317,7 @@ public class View extends JPanel{
 			setup(controller);
 			break;
 		case COMPLETESCREEN: 
-			setupNewGame();
+			setup(controller);
 			break;
 		}
 	}
@@ -370,7 +369,6 @@ public class View extends JPanel{
 //	    
 //	    // Add each component to the window in their respective positions.
 	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
-//	    window.getContentPane().add(options, BorderLayout.CENTER);
 	    window.getContentPane().add(messages, BorderLayout.SOUTH);
 	    window.pack();
 //	    
