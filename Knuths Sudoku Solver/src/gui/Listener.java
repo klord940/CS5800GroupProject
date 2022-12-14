@@ -1,13 +1,14 @@
 package gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 
 /**
  * The listener for the Sudoku game, contains the action to perform when buttons are clicked.
  * 
  * @author Robert Wilson
  * Created: 19 NOV 2022
- * Class: CS 5800
+ * Class: cs5800
  *
  */
 public class Listener implements ActionListener {
@@ -37,6 +38,22 @@ public class Listener implements ActionListener {
 			controller.checkSolution();
 		} else if(view.isBack(e)) {
 			controller.back();
+		} else if(view.isTextInput(e)) {
+			controller.sendToTextInput();
+		} else if(view.isUploadFileButton(e)) {
+			controller.uploadFile();
+		} else if(view.isFileChooser(e)) {
+			try {
+				if (e.getActionCommand() == "ApproveSelection") {
+					controller.getSelectedFile();
+				}
+				else if (e.getActionCommand() == "CancelSelection"){
+					controller.closeDialog();
+				}
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} else {
 			controller.update(e);
 		}

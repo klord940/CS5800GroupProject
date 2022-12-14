@@ -1,13 +1,17 @@
 package gui;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import algorithm.Sudoku;
 
 /**
  * Sudoku model contains all functionality of the game.
  * 
  * @author Robert Wilson
+ * @author Kristina Lord
  * Created: 19 NOV 2022
- * Class: CS 5800 
+ * Class: CS5800 
  */
 public class Model {
 	
@@ -20,6 +24,8 @@ public class Model {
 	
 	// The size of our board[size][size]
 	private final int size = 9;
+	
+	private int[][] solution;
 	
 	/**
 	 * Constructor creates a new board of size*size, populates it with the initial conditions, and sets the win condition to false.
@@ -69,41 +75,43 @@ public class Model {
 	 * 
 	 * @return true if the given puzzle is valid	 
 	 */
-	public boolean isValidPuzzle() {
-		// test input for int[][] matrix vs. Integer[][] matrix
-		/*
-		int [][] inputGrid = {
-				{1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0}				
-		};
-		*/
-		
-		// Count instances of non null values
+	public boolean isValidPuzzle(Controller controller) {
 		int count = 0;
 		for(Integer[] i : board) {
 			for(Integer j : i) {
-				if(j != null) {
-					count++;
+				if (j != null) {
+					if(j.intValue() != 0) {
+						count++;
+					}					
 				}
+
 			}
 		}
 		
 		// If there is less than 17 filled spots the solver will take too long
 		if(count <= 16) {
-			return validPuzzle = false;
+			return false;
 		}
 		
 		// If there is greater than 16 filled spots there is an unique solution for it
-		Sudoku s = new Sudoku(board);
-		this.validPuzzle = s.solve();
-		return validPuzzle;
+		Sudoku s = new Sudoku(this.board);
+		boolean solvable = s.solve();
+		
+		if (solvable == false) {
+			return false;
+		}
+		
+		else {
+			int[][] solution = s.getSolution();
+			int i;
+			int j;
+			for (i=0; i<solution.length; i++) {
+				for (j=0; j<solution[i].length; j++) {
+					this.board[i][j] = new Integer(solution[i][j]);
+				}
+			}
+			return true;
+		}
 	}
 	
 	/**
@@ -126,5 +134,13 @@ public class Model {
 	 */
 	public Integer getMarkAt(int r, int c) {
 		return this.board[r][c];
+	}
+	
+	public void setBoard(Integer[][] newBoard) {
+		this.board = newBoard;
+	}
+	
+	public Integer[][] getBoard() {
+		return this.board;
 	}
 }
