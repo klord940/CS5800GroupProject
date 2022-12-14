@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -114,13 +116,8 @@ public class View extends JPanel{
 		        		board[row][col].addActionListener(listener);
 		        }
 			}
-//			checkSolution.addActionListener(listener);
 			back.addActionListener(listener);
 			break;
-//		case TEXTINPUTSCREEN: 
-//			back.addActionListener(listener);
-//			checkSolution.addActionListener(listener);
-//			break;
 		case GAMESCREEN:
 			// This can be a played game or solution viewer
 		case COMPLETESCREEN:
@@ -263,12 +260,10 @@ public class View extends JPanel{
 	    
 	    // Options panel holds all options a user can take.
 	    reset.setBackground(Color.cyan);
-	    checkSolution.setText("Check if a solution exists and submit");
 	    options.remove(reset);
 	    options.remove(textInputButton);	    
-	    options.add(checkSolution);
-	    options.add(back);
-
+	    back.addActionListener(listener);
+		options.add(back);
 	    
 	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
 	    window.getContentPane().add(options, BorderLayout.CENTER);
@@ -373,17 +368,17 @@ public class View extends JPanel{
 	    options.add(checkSolution);
 	    options.add(back);
 	    
-//	    // Messages is the turn indicator and relays important messages about the game state.
+	    // Messages is the turn indicator and relays important messages about the game state.
 	    messages.setBackground(Color.white);
 	    messages.add(importText);
 	    importText.setFont(importText.getFont().deriveFont(Font.BOLD, 20F));
 	    importText.setText("Select a square to increment number");
-//	    
-//	    // Add each component to the window in their respective positions.
+    
+	    // Add each component to the window in their respective positions.
 	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
 	    window.getContentPane().add(messages, BorderLayout.SOUTH);
 	    window.pack();
-//	    
+	    
 	    // change the gameState to play state.
 	    controller.gameState = GameState.INPUTSCREEN;
 	    setActionListener(controller);
@@ -405,6 +400,13 @@ public class View extends JPanel{
 			dialog.add(fileChooser);
 			dialog.show();
 			dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			dialog.addWindowListener(new WindowAdapter()
+		    {
+			      public void windowClosing(WindowEvent e)
+			      {
+			    	uploadFileButton.setEnabled(true);
+			      }
+			    });
 			
 		} catch (Exception error) {
 			System.out.println("error: " + error.toString());
