@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
  * The listener for the Sudoku game, contains the action to perform when buttons are clicked.
  * 
  * @author Robert Wilson
- * @author Kristina Lord
  * Created: 19 NOV 2022
  * Class: cs5800
  *
