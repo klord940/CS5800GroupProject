@@ -91,7 +91,7 @@ public class DLX {
 			// we choose column c
 		    ColumnNode c = selectColumnNodeHeuristic();
 		    c.cover();
-		    System.out.println("Column size: " + c.size);
+		    
 		    for (DancingNode r = c.bottom; r != c; r = r.bottom) {
 		    	// We add r line to partial solution
 		    	answer.add(r);

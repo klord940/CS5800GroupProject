@@ -83,7 +83,7 @@ public class Sudoku {
   	}
 
 	/**
-	 * Building of an empty cover matrix, using the constraints outlined below for Sudoku.
+	 * Building of an empty cover matrix, using the constraints outlined below for Hyper Sudoku.
 	 * 
 	 * @return coverMatrix (int[][]) the empty Cover Matrix with the constraints applied.
 	 */
@@ -91,59 +91,91 @@ public class Sudoku {
 		int[][] coverMatrix = new int[SIZE * SIZE * MAX_VALUE][SIZE * SIZE * CONSTRAINTS];
 
 	    int header = 0;
-	    header = createCellConstraints(coverMatrix, header);// System.out.println("Header: " + header);
-	    header = createRowConstraints(coverMatrix, header); //System.out.println("Header: " + header);
-	    header = createColumnConstraints(coverMatrix, header);// System.out.println("Header: " + header);
-		//System.out.println("Box: ");
-	    header = createBoxConstraints(coverMatrix, header); //System.out.println("Header: " + header);
-	    //System.out.println(countMatrix(coverMatrix) + " Header: " + header);
-	    //createCellConstraints(coverMatrix, header);
-	    System.out.println("HyperBox2");
-	    createHyperBoxConstraints2(coverMatrix, header); 
-	    System.out.println("HyperBox");
+	    header = createCellConstraints(coverMatrix, header);
+	    header = createRowConstraints(coverMatrix, header);
+	    header = createColumnConstraints(coverMatrix, header);
+	    header = createBoxConstraints(coverMatrix, header);
 	    header = createHyperBoxConstraints(coverMatrix, header);
-	    //System.out.println(countMatrix(coverMatrix) + " Header: " + header);
 	    
 	    return coverMatrix;
   	}
-
-	private int createHyperBoxConstraints(int[][] matrix, int header) {
-		header += 10;
-		for(int row = (COVER_START_INDEX + 1); row <= SIZE; row += (BOX_SIZE + 1)) {
-			for(int column = (COVER_START_INDEX + 1); column <= SIZE; column += (BOX_SIZE + 1)) {
-				for(int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
-					for(int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
-						for(int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
-							System.out.println("Hyper Header: " + header);
-							System.out.println("Row: " + (row + rowDelta) + "\tColumn: " + (column + columnDelta) + "\tNumber: " + n);
-							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
-							matrix[index][header] = 1;
-						}
-					}
-				}
-			}
-		}
-		return header;
-	}
 	
+	/**
+	 * Helper function to covers the constraints for outside the hyper boxes, 
+	 * which is the same as the cell constraints.
+	 * 
+	 * @param matrix (int[][]) Cover Matrix so far.
+	 * @param header (int) the header to start at
+	 * @return header (int) This should not be used by the parent constraint
+	 */
 	private int createHyperBoxConstraints2(int[][] matrix, int header) {		
 		for (int row = COVER_START_INDEX; row <= SIZE; row++) {
 			for (int column = COVER_START_INDEX; column <= SIZE; column++, header++) {
+				// If we are inside the Hyper cubes do not place any constraints
+				if(((row >= 2 && row <= 4) && (column >= 2 && column <= 4)) || ((row >= 2 && row <= 4) && (column >= 6 && column <= 8)) || ((row >= 6 && row <= 8) && (column >= 2 && column <= 4)) || ((row >= 6 && row <= 8) && (column >= 6 && column <= 8))) {
+					//System.out.println("row: " + row + "\tColumn: " + column + "\tNumber: " + n + "\tHeader: " + header);
+					continue;
+				}
 				for (int n = COVER_START_INDEX; n <= SIZE; n++) {
-					if(((row >= 2 && row <= 4) && (column >= 2 && column <= 4)) || ((row >= 2 && row <= 4) && (column >= 6 && column <= 8)) || ((row >= 6 && row <= 8) && (column >= 2 && column <= 4)) || ((row >= 6 && row <= 8) && (column >= 6 && column <= 8))) {
-						System.out.println("Header: " + header);
-						continue;
-					} else {
-						System.out.println("row: " + row + "\tColumn: " + column + "\tNumber: " + n);
-						int index = indexInCoverMatrix(row, column, n);
-						matrix[index][header] = 1;
-					}
+					//System.out.println("row: " + row + "\tColumn: " + column + "\tNumber: " + n);
+					int index = indexInCoverMatrix(row, column, n);
+					matrix[index][header] = 1;
 				}
 			}
 		}
 	    return header;
 	}
 
+	/**
+	 * Creates the constraints for the Hyper portion of the Hyper Sudoku
+	 * 
+	 * @param matrix (int[][]) Cover Matrix so far.
+	 * @param header (int) the header to start at
+	 * @return header (int) The final header at the end of this project...  So far...
+	 */
+	private int createHyperBoxConstraints(int[][] matrix, int header) {
+		// Create the constraints outside of the hyper cubes
+		createHyperBoxConstraints2(matrix, header);
+		
+		// Initialize starter variables
+		int count = 0;
+		header += 10;
+		
+		// Iterate through the Hyper cubes
+		for(int row = (COVER_START_INDEX + 1); row <= SIZE; row += (BOX_SIZE + 1)) {
+			for(int column = (COVER_START_INDEX + 1); column <= SIZE; column += (BOX_SIZE + 1)) {
+				for(int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
+					for(int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
+						for(int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
+							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
+							matrix[index][header] = 1;
+						}
+					}
+					
+					// At the end of a boxes size we need to skip a header
+					if(n % BOX_SIZE == 0 ) {
+						header++;
+						count++;
+					}
+					
+					// At the end of a row we need to add another header to account for starting at column 2 
+					if(count == (BOX_SIZE-1)) {
+						header++;
+						count = 0;
+					}
+				}
+			}
+			// Can make this better
+			// Skip rows as needed
+			if(row == 2) {
+				header += SIZE;
+			} else {
+				header += SIZE-1;
+			}
+		}
+		return header;
+	}
+	
 	/**
 	 * Creates the Box constraints which are BOXSIZE x BOXSIZE. 
 	 * Only values from MIN_VALUE through MAX_VALUE in the BOX_SIZE once.
@@ -158,7 +190,6 @@ public class Sudoku {
 				for (int n = COVER_START_INDEX; n <= SIZE; n++, header++) {
 					for (int rowDelta = 0; rowDelta < BOX_SIZE; rowDelta++) {
 						for (int columnDelta = 0; columnDelta < BOX_SIZE; columnDelta++) {
-							//System.out.println("Row: " + (row + rowDelta) + "\tColumn: " + (column + columnDelta) + "\tNumber: " + n);
 							int index = indexInCoverMatrix(row + rowDelta, column + columnDelta, n);
 							matrix[index][header] = 1;
 						}
@@ -253,7 +284,6 @@ public class Sudoku {
 				}
 			}
 		}
-		System.out.println(countMatrix(coverMatrix));
 	    return coverMatrix;
 	}
 
@@ -271,8 +301,7 @@ public class Sudoku {
 		
 		// convert the input grid into a cover matrix
 		int[][] cover = convertInCoverMatrix(grid);
-		//printCoverMatrix(cover);
-		//printMatrix(cover);
+		
 		// create a quadruple chained double linked list
 		DLX dlx = new DLX(cover);
 		
@@ -317,6 +346,14 @@ public class Sudoku {
 		}
 	}
 
+	/**
+	 * Counts and displays the number of option selections made.
+	 * Mainly for debugging.
+	 * 
+	 * @param matrix (int[][]) Cover Matrix to be processed
+	 * @return count (int) The number of 1s in the cover matrix, 
+	 * 						indicating an option is selected
+	 */
 	private int countMatrix(int[][] matrix) {
 		int count = 0;
 		for(int[] i : matrix) {
@@ -327,6 +364,11 @@ public class Sudoku {
 		return count;
 	}
 	
+	/**
+	 * Prints the full cover matrix out. mainly for debugging.
+	 * 
+	 * @param matrix (int[][]) Cover matrix to print out
+	 */
 	private void printMatrix(int[][] matrix) {
 		for(int[] i : matrix) {
 			for(int j : i) {
@@ -432,8 +474,19 @@ public class Sudoku {
 				{0, 8, 3, 0, 0, 0, 0, 4, 0}				
 		};
 		
-		
 		int[][] HyperInput = {
+				{1, 0, 6, 2, 4, 3, 0, 0, 0},
+				{2, 3, 0, 7, 0, 9, 0, 5, 6},
+				{7, 0, 9, 5, 0, 6, 2, 4, 0},
+				{9, 6, 0, 1, 5, 7, 0, 3, 0},
+				{5, 0, 3, 8, 6, 2, 9, 0, 7},
+				{8, 7, 0, 3, 0, 4, 0, 0, 5},
+				{4, 0, 5, 6, 0, 8, 3, 0, 0},
+				{6, 9, 0, 4, 0, 1, 0, 7, 0},
+				{3, 1, 7, 9, 2, 5, 4, 6, 8}
+		};
+		
+		int[][] HyperInput_solution = {
 				{1, 5, 6, 2, 4, 3, 7, 8, 9},
 				{2, 3, 4, 7, 8, 9, 1, 5, 6},
 				{7, 8, 9, 5, 1, 6, 2, 4, 3},
@@ -444,6 +497,8 @@ public class Sudoku {
 				{6, 9, 8, 4, 3, 1, 5, 7, 2},
 				{3, 1, 7, 9, 2, 5, 4, 6, 8}
 		};
+		
+		
 		
 		int[][] HyperInput2 = {
 				{0, 0, 0, 0, 0, 6, 0, 0, 0},
@@ -465,7 +520,7 @@ public class Sudoku {
 		};
 		
 		// create an instance of itself to solve
-		Sudoku s = new Sudoku(HyperInput2);
+		Sudoku s = new Sudoku(HyperInput);
 		
 		// Solve said instance
 		s.solve();
