@@ -8,6 +8,7 @@ import java.util.List;
  * This class will call the Dancing Links algorithm X runner, DLX.java.
  * 
  * @author Robert Wilson
+ * @author Kristina Lord
  * Created: 09 DEC S2022
  * Class: CS 5800
  */
@@ -291,6 +292,10 @@ public class Sudoku {
 		
 		// Return boolean of whether the problem has been solved
 		return solved;
+	}
+	
+	public int[][] getSolution() {
+		return this.gridSolved;
 	}
 
 	/**
