@@ -2,20 +2,29 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import java.util.Scanner; // Import the Scanner class to read text files
+
 
 /**
  * The GUI of the Sudoku solver.  creates a JFrame, with sub panels to 
  * hold the various game objects.
  * 
  * @author Robert Wilson
+ * @author Kristina Lord
  * Created: 19 NOV 2022
- * Class: CS 5800
+ * Class: CS5800
  *
  */
 
@@ -37,11 +46,18 @@ public class View extends JPanel{
 	private JPanel gamePanel;
 	private JPanel messages;
 	private JPanel options;
+	private JButton textInputButton;
+	private JFileChooser fileChooser;
+	private JButton uploadFileButton;
+	private JDialog dialog = new JDialog();
+
 	
 	// window settings
-	private final int resolution = 48;
-	private int screenWidth = resolution * 10;
-	private int screenHeight = resolution * 10;
+	private final int resolution = 35;
+	private int screenWidth = resolution * 20;
+	private int screenHeight = resolution * 20;
+	private Dimension cellSize = new Dimension(80, 80);
+	private Font cellFont = new Font("Arial", Font.BOLD, 40);
 	
 	// Other important fields
 	//private GameState gameState;
@@ -64,10 +80,13 @@ public class View extends JPanel{
 		this.reset = new JButton();
 		this.checkSolution = new JButton();
 		this.back = new JButton("Back");
+		this.textInputButton = new JButton();
+		this.fileChooser = new JFileChooser();
 				
 		// JLabel and ActionListener initialization
 		this.importText = new JLabel();
 		this.listener = new Listener(controller, this);
+		this.uploadFileButton = new JButton();
 		
 		// Set the gameState before calling setActionListener
 		//this.gameState = GameState.TITLESCREEN;
@@ -86,7 +105,7 @@ public class View extends JPanel{
 		switch(controller.gameState) {
 		case TITLESCREEN:
 			reset.addActionListener(listener);
-			checkSolution.addActionListener(listener);
+			textInputButton.addActionListener(listener);
 			break;
 		case INPUTSCREEN: 
 			for(int row = 0; row<9 ;row++) {
@@ -94,8 +113,13 @@ public class View extends JPanel{
 		        		board[row][col].addActionListener(listener);
 		        }
 			}
+			checkSolution.addActionListener(listener);
 			back.addActionListener(listener);
 			break;
+//		case TEXTINPUTSCREEN: 
+//			back.addActionListener(listener);
+//			checkSolution.addActionListener(listener);
+//			break;
 		case GAMESCREEN:
 			// This can be a played game or solution viewer
 		case COMPLETESCREEN:
@@ -104,7 +128,7 @@ public class View extends JPanel{
 			break;
 		}
 	}
-	
+
 	/**
 	 * Creation method for the title screen, initializing window settings 
 	 * and then drawing the title screen components.
@@ -132,13 +156,15 @@ public class View extends JPanel{
 		
 		// Button text fields
 		reset.setText("Manual Input");
-		checkSolution.setText("Text Input");
+		textInputButton.setText("Text Input");
 		
 		// Add option to start game.
 		reset.setBackground(Color.cyan);
 	    options.add(reset);
-	    options.add(checkSolution);
+	    options.add(textInputButton);
 	    options.remove(back);
+	    options.remove(checkSolution);
+
 		
 	    // Add each component to the window in their respective positions.
 	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
@@ -159,13 +185,15 @@ public class View extends JPanel{
 		// Remove all title screen components and validates to make sure it can still be used.
 		gamePanel.removeAll();
 		gamePanel.validate();
+		options.removeAll();
+		messages.removeAll();
 		
 		// The game itself, a grid of n x n tiles.
 		JPanel game = new JPanel(new GridLayout(9,9));
 		for(int row = 0; row<9 ;row++) {
 	        for(int col = 0; col<9 ;col++) {
 	            board[row][col] = new JButton();
-	            board[row][col].setPreferredSize(new Dimension(resolution*2, resolution*2));
+	            board[row][col].setPreferredSize(cellSize);
 	            board[row][col].setText("");
 	            game.add(board[row][col]);
 	            // Add Grid Lines most likely with paint.
@@ -200,6 +228,49 @@ public class View extends JPanel{
 	    
 	    // change the gameState to play state.
 	    controller.gameState = GameState.INPUTSCREEN;
+	    setActionListener(controller);
+	}
+	
+	/**
+	 * Creates the play state of the game by first removing all title related components 
+	 * and then loading in the play state components which includes the board, reset button, 
+	 * and check solution button.
+	 */
+	protected void setupTextInputView(Controller controller) {
+		// Remove all title screen components and validates to make sure it can still be used.
+		gamePanel.removeAll();
+		gamePanel.validate();
+		options.removeAll();
+		messages.removeAll();
+		
+        // restrict the user to select files of all types
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        // only allow files of .txt extension
+        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+        fileChooser.addChoosableFileFilter(restrict);
+        		
+		// Center this game matrix on the gamePanel.
+        uploadFileButton.addActionListener(listener);
+	    
+		uploadFileButton.setText("Upload Text File");
+	    gamePanel.add(uploadFileButton, BorderLayout.AFTER_LAST_LINE);
+	    
+	    // Options panel holds all options a user can take.
+	    reset.setBackground(Color.cyan);
+	    checkSolution.setText("Check if a solution exists and submit");
+	    options.remove(reset);
+	    options.remove(textInputButton);	    
+	    options.add(checkSolution);
+	    options.add(back);
+
+	    
+	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
+	    window.getContentPane().add(options, BorderLayout.CENTER);
+	    window.pack();
+	    
+	    setActionListener(controller);
+	    
 	}
 	
 	/**
@@ -221,6 +292,7 @@ public class View extends JPanel{
 	        for(int col = 0; col<9 ;col++) {
 	            board[row][col].setText("");
 	            board[row][col].setEnabled(true);
+	            board[row][col].setBackground(new JButton().getBackground());
 		    }
 		}
 		importText.setText("Select a square to increment number");
@@ -233,20 +305,174 @@ public class View extends JPanel{
 	 * then perform same action as play screen.  
 	 */
 	void resetButton(Controller controller) {
+		checkSolution.setEnabled(true);
 		switch(controller.gameState) {
 		case TITLESCREEN: 
 			setup(controller);
-			setActionListener(controller);
 			break;
+		case TEXTINPUTSCREEN:
+			setup(controller);
 		case INPUTSCREEN:
+			setup(controller);
 		case GAMESCREEN: 
-			setupNewGame();
+			setup(controller);
 			break;
 		case COMPLETESCREEN: 
 			setupNewGame();
 			break;
 		}
 	}
+	
+	private void setupBoardFromTextInput(Controller controller, Integer[][] boardNums) {
+		// Remove all title screen components and validates to make sure it can still be used.
+		gamePanel.removeAll();
+		options.removeAll();
+		messages.removeAll();
+		gamePanel.validate();
+		
+		// The game itself, a grid of n x n tiles.
+		JPanel game = new JPanel(new GridLayout(9,9));
+		for(int row = 0; row<9 ;row++) {
+	        for(int col = 0; col<9 ;col++) {
+	            board[row][col] = new JButton();
+	            board[row][col].setPreferredSize(cellSize);
+	    		board[row][col].setFont(cellFont);
+	    		if (boardNums[row][col] == 0) {
+	    			board[row][col].setText("");
+	    		}
+	    		else {
+		            board[row][col].setText(String.valueOf(boardNums[row][col]));	
+	    		}
+	            game.add(board[row][col]);
+	            // Add Grid Lines most likely with paint.
+	            if(col%3 == 0) {
+	            	
+	            }
+		    }
+		}
+		
+		// Center this game matrix on the gamePanel.
+	    gamePanel.add(game, BorderLayout.AFTER_LAST_LINE);
+	    
+	    // Options panel holds all options a user can take.
+	    reset.setBackground(Color.cyan);
+	    reset.setText("New Board");
+	    checkSolution.setText("Check if a solution exists and submit");
+	    options.add(reset);
+	    options.add(checkSolution);
+	    options.add(back);
+	    
+//	    // Messages is the turn indicator and relays important messages about the game state.
+	    messages.setBackground(Color.white);
+	    messages.add(importText);
+	    importText.setFont(importText.getFont().deriveFont(Font.BOLD, 20F));
+	    importText.setText("Select a square to increment number");
+//	    
+//	    // Add each component to the window in their respective positions.
+	    window.getContentPane().add(gamePanel, BorderLayout.NORTH);
+//	    window.getContentPane().add(options, BorderLayout.CENTER);
+	    window.getContentPane().add(messages, BorderLayout.SOUTH);
+	    window.pack();
+//	    
+	    // change the gameState to play state.
+	    controller.gameState = GameState.INPUTSCREEN;
+	    setActionListener(controller);
+
+	}
+	
+	
+	public void showUploadFile() {
+        // restrict the user to select files of all types
+		try {
+	        fileChooser.setAcceptAllFileFilterUsed(false);
+	
+	        // only allow files of .txt extension
+	        FileNameExtensionFilter restrict = new FileNameExtensionFilter("Only .txt files", "txt");
+	        fileChooser.addChoosableFileFilter(restrict);
+	        fileChooser.addActionListener(this.listener);
+			dialog.setSize(new Dimension(400, 400));
+			uploadFileButton.setEnabled(false);
+			dialog.add(fileChooser);
+			dialog.show();
+			dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+		} catch (Exception error) {
+			System.out.println("error: " + error.toString());
+		}
+
+	}
+	
+	public void closeDialog() {
+		uploadFileButton.setEnabled(true);
+		dialog.dispose();
+	}
+	
+	public void getSelectedFile(Controller controller) throws FileNotFoundException {
+		File selectedFile = fileChooser.getSelectedFile();
+		Scanner scanner = new Scanner(selectedFile);
+		int i = 0;
+		Integer[][] boardNums = new Integer[9][9];
+		try {		
+			while (scanner.hasNext()) {
+				String data = scanner.next();
+				char[] charArray = data.toCharArray();
+				int j;
+				for (j = 0; j < charArray.length; j++) {
+					boardNums[i][j] = new Integer(Character.getNumericValue(charArray[j]));		
+				}
+				i++;				
+			}
+			controller.setBoard(boardNums);
+			setupBoardFromTextInput(controller, boardNums);
+			closeDialog();
+			scanner.close();			
+		} catch (Exception error) {
+			this.closeDialog();
+			importText.setText("Unable to upload. Please review the formatting of the file.");
+			messages.add(importText);
+			gamePanel.add(messages, BorderLayout.CENTER);
+		}
+			
+	}
+	
+	public void updateBoard(Integer[][] updatedBoard) {
+		int i;
+		int j;
+		for (i=0; i<9; i++) {
+			for (j=0; j<9; j++) {
+				if (!this.board[i][j].getText().equals(String.valueOf(updatedBoard[i][j]))) {
+					this.board[i][j].setText(String.valueOf(updatedBoard[i][j]));
+					this.board[i][j].setBackground(Color.GREEN);
+				}
+				else {
+					this.board[i][j].setBackground(new JButton().getBackground());
+				}
+	            board[i][j].setPreferredSize(cellSize);
+	    		board[i][j].setFont(cellFont);
+			}
+		}
+		completedScreen();
+	}
+	
+	public void setInvalidBoard() {
+	    // Messages is the turn indicator and relays important messages about the game state.
+	    messages.setBackground(Color.white);
+	    messages.add(importText);
+	    importText.setFont(importText.getFont().deriveFont(Font.BOLD, 20F));
+	    importText.setText("Invalid puzzle. Try again.");
+		int i;
+		int j;
+		for (i=0; i<9; i++) {
+			for (j=0; j<9; j++) {
+				this.board[i][j].setBackground(Color.RED);
+			}
+		}
+		options.remove(checkSolution);
+
+	    // Add each component to the window in their respective positions.
+	    window.getContentPane().add(messages, BorderLayout.SOUTH);
+	}
+
 
 	/**
 	 * Checks to see if the reset button was pressed last.
@@ -285,6 +511,36 @@ public class View extends JPanel{
 	}
 	
 	/**
+	 * Checks to see if the text input button was pressed last.
+	 * 
+	 * @param e (ActionEvent) button pressed.
+	 * @return boolean of whether reset button was pressed.
+	 */
+	public boolean isTextInput(ActionEvent e) {
+		if(e.getSource() == textInputButton) {
+			return true;
+		}  return false;
+	}
+	
+	
+	public boolean isFileChooser(ActionEvent e) {
+		if(e.getSource() == fileChooser) {
+			return true;
+		}  return false;
+	}
+	/**
+	 * Checks to see if the upload file button was pressed last.
+	 * 
+	 * @param e (ActionEvent) button pressed.
+	 * @return boolean of whether reset button was pressed.
+	 */
+	public boolean isUploadFileButton(ActionEvent e) {
+		if(e.getSource() == uploadFileButton) {
+			return true;
+		}  return false;
+	}
+	
+	/**
 	 * Grabs the source of the button to send onto model as a two element arrayList.
 	 * 
 	 * @param e (ActionEvent) button pressed.
@@ -311,12 +567,11 @@ public class View extends JPanel{
 	 * @param integer (Integer) the current integer to display, nothing if null.
 	 */
 	public void update(ArrayList<Integer> playerMove, Integer integer) {
-		board[playerMove.get(0)][playerMove.get(1)].setFont(new Font("Arial", Font.BOLD, 80));
+		board[playerMove.get(0)][playerMove.get(1)].setFont(cellFont);
 		if(integer == null) {
 			board[playerMove.get(0)][playerMove.get(1)].setText("");
 		} else {
 			board[playerMove.get(0)][playerMove.get(1)].setText(integer.toString());
 		}
-		//board[playerMove.get(0)][playerMove.get(1)].setEnabled(true);
 	}
 }
