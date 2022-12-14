@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  * 
  * @author Robert Wilson
  * Created: 19 NOV 2022
- * Class: CS 5800 
+ * Class: CS5800 
  * 
  */
 
@@ -49,11 +50,12 @@ public class Controller {
 	public void checkSolution() {
 		switch(this.gameState) {
 		case INPUTSCREEN:
-			if(!model.validPuzzle) {
-				model.isValidPuzzle();
-				if(model.validPuzzle) {
-					setGameState(GameState.GAMESCREEN);
-				}
+			boolean truthy = model.isValidPuzzle(this);
+			if(truthy == false) {
+				view.setInvalidBoard();
+			}
+			else {
+				view.updateBoard(model.getBoard());
 			}
 		case GAMESCREEN:
 			if(!model.gameOver) {
@@ -78,13 +80,26 @@ public class Controller {
 		case INPUTSCREEN:
 			setGameState(GameState.TITLESCREEN);
 			break;
+		case TEXTINPUTSCREEN:
+			setGameState(GameState.TITLESCREEN);
+			break;
 		case GAMESCREEN:
+			this.model = new Model();
+			this.view = new View(this);
 			setGameState(GameState.INPUTSCREEN);
 			break;
 		case COMPLETESCREEN:
 			setGameState(GameState.TITLESCREEN);
 			break;
 		}
+	}
+	
+	/**
+	 * Tells the view to go back to the previous page
+	 * 
+	 */
+	public void sendToTextInput() {
+		setGameState(GameState.TEXTINPUTSCREEN);
 	}
 	
 	/**
@@ -100,6 +115,34 @@ public class Controller {
 		}
 	}
 	
+	public void updateBoard() {
+		view.updateBoard(model.getBoard());
+	}
+	
+	public void setInvalidBoard() {
+		view.setInvalidBoard(); 
+	}
+	
+	public void setBoard(Integer[][] newBoard) {
+		model.setBoard(newBoard);
+	}
+	
+	public Integer[][] getBoard() {
+		return model.getBoard();
+	}
+	
+	public void uploadFile() {
+		view.showUploadFile();
+	}
+	
+	public void getSelectedFile() throws FileNotFoundException {
+		// do stuff
+		view.getSelectedFile(this);
+	}
+	
+	public void closeDialog() {
+		view.closeDialog();
+	}
 	/**
 	 * Sets the current gameState to parameter gameState. If victory state, then call completedScreen method.
 	 * 
@@ -115,6 +158,9 @@ public class Controller {
 			break;
 		case COMPLETESCREEN:
 			view.completedScreen();
+			break;
+		case TEXTINPUTSCREEN:
+			view.setupTextInputView(this);
 			break;
 		default:
 			break;
