@@ -321,6 +321,14 @@ public class Sudoku {
 		// Return boolean of whether the problem has been solved
 		return solved;
 	}
+	
+	/**  
+	 * 
+	 * @return solution in the form of a 2d integer array
+	 */
+	public int[][] getSolution() {
+		return this.gridSolved;
+	}
 
 	/**
 	 * Displays the original grid and the solution grid to the console terminal.
