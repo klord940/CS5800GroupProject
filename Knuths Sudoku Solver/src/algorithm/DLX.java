@@ -10,6 +10,7 @@ import java.util.List;
  * linked list.
  * 
  * @author Robert Wilson
+ * @author Peter Sternhagen
  * Created: 09 DECS 2022
  * Class: CS 5800
  */
