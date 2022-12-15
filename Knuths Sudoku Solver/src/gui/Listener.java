@@ -29,6 +29,11 @@ public class Listener implements ActionListener {
 		this.view = view;
 	}
 	
+	/**
+	 * Action listener for all buttons
+	 * Checks for which button is being pressed and passes to 
+	 * the appropriate controller method
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// Perform the requested action depending on button pressed

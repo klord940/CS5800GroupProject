@@ -1,8 +1,5 @@
 package gui;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import algorithm.Sudoku;
 
 /**
@@ -23,10 +20,7 @@ public class Model {
 	boolean gameOver;
 	
 	// The size of our board[size][size]
-	private final int size = 9;
-	
-	private int[][] solution;
-	
+	private final int size = 9;	
 	/**
 	 * Constructor creates a new board of size*size, populates it with the initial conditions, and sets the win condition to false.
 	 */
@@ -97,6 +91,9 @@ public class Model {
 		Sudoku s = new Sudoku(this.board);
 		boolean solvable = s.solve();
 		
+		/**
+		 * If solvable is false, return false and skip the board setting
+		 */
 		if (solvable == false) {
 			return false;
 		}
@@ -136,10 +133,18 @@ public class Model {
 		return this.board[r][c];
 	}
 	
+	/**
+	 * sets the model's board
+	 * @param newBoard
+	 */
 	public void setBoard(Integer[][] newBoard) {
 		this.board = newBoard;
 	}
 	
+	/**
+	 * gets the model's board
+	 * @return Integer[][]
+	 */
 	public Integer[][] getBoard() {
 		return this.board;
 	}
