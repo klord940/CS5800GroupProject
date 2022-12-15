@@ -325,6 +325,11 @@ public class View extends JPanel{
 		}
 	}
 	
+	/**
+	 * Sets up the view for the Text Input state (File Uploads)
+	 * @param controller
+	 * @param boardNums
+	 */
 	private void setupBoardFromTextInput(Controller controller, Integer[][] boardNums) {
 		// Remove all title screen components and validates to make sure it can still be used.
 		gamePanel.removeAll();
@@ -385,7 +390,9 @@ public class View extends JPanel{
 
 	}
 	
-	
+	/**
+	 * Sets up the state for taking in plain txt files to submit a txt soduko file
+	 */
 	public void showUploadFile() {
         // restrict the user to select files of all types
 		try {
@@ -414,11 +421,20 @@ public class View extends JPanel{
 
 	}
 	
+	/**
+	 * Closes the dialog for the file upload
+	 */
 	public void closeDialog() {
 		uploadFileButton.setEnabled(true);
 		dialog.dispose();
 	}
 	
+	/**
+	 * Sets up the board given a file input
+	 * Triggered when the file upload action even is fired
+	 * @param controller
+	 * @throws FileNotFoundException
+	 */
 	public void getSelectedFile(Controller controller) throws FileNotFoundException {
 		File selectedFile = fileChooser.getSelectedFile();
 		Scanner scanner = new Scanner(selectedFile);
@@ -447,6 +463,10 @@ public class View extends JPanel{
 			
 	}
 	
+	/**
+	 * Updates the board view given a valid soduko solution
+	 * @param updatedBoard
+	 */
 	public void updateBoard(Integer[][] updatedBoard) {
 		int i;
 		int j;
@@ -472,6 +492,9 @@ public class View extends JPanel{
 		completedScreen();
 	}
 	
+	/**
+	 * Updates the board with invalid styling given an invalid soduko puzzle
+	 */
 	public void setInvalidBoard() {
 	    // Messages is the turn indicator and relays important messages about the game state.
 	    messages.setBackground(Color.white);
@@ -540,7 +563,11 @@ public class View extends JPanel{
 		}  return false;
 	}
 	
-	
+	/**
+	 * boolean check for whether the given element is the file chooser
+	 * @param e
+	 * @return boolean
+	 */
 	public boolean isFileChooser(ActionEvent e) {
 		if(e.getSource() == fileChooser) {
 			return true;
