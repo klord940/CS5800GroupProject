@@ -116,31 +116,56 @@ public class Controller {
 		}
 	}
 	
+	/**
+	 * Updates the board view if the Soduko returns a valid board
+	 */
 	public void updateBoard() {
 		view.updateBoard(model.getBoard());
 	}
 	
+	/**
+	 * Updates the board view with invalid styling if Soduko returns 
+	 * false (the board is unsolvable)
+	 */
 	public void setInvalidBoard() {
 		view.setInvalidBoard(); 
 	}
 	
+	/**
+	 * Sets the board model with a new Integer 2D array
+	 * @param newBoard
+	 */
 	public void setBoard(Integer[][] newBoard) {
 		model.setBoard(newBoard);
 	}
 	
+	/**
+	 * Returns the model's current board state
+	 * @return
+	 */
 	public Integer[][] getBoard() {
 		return model.getBoard();
 	}
 	
+	/**
+	 * Updates the view with the Upload File State
+	 */
 	public void uploadFile() {
 		view.showUploadFile();
 	}
 	
+	/** 
+	 * Returns the file that's uploaded in the uploadFile view
+	 * @throws FileNotFoundException
+	 */
 	public void getSelectedFile() throws FileNotFoundException {
 		// do stuff
 		view.getSelectedFile(this);
 	}
 	
+	/**
+	 * Closes the dialog (if the user didn't use the native close option)
+	 */
 	public void closeDialog() {
 		view.closeDialog();
 	}
